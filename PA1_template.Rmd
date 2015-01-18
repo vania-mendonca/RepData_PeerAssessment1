@@ -149,27 +149,47 @@ The imputing of new data adds new values that were not considered before, theref
 
 ```{r, echo = TRUE}
 
-# Daily average number of steps per interval (filled data)
-avgStepsFilledPerInterval <- aggregate(dataFilled$steps, by=list(dataFilled$interval), FUN=mean)
-avgStepsFilledPerInterval <- setNames(avgStepsFilledPerInterval, c("Interval", "StepsAvg"))
+
+#avgStepsFilledPerInterval <- aggregate(dataFilled$steps, by=list(dataFilled$interval), FUN=mean)
+#avgStepsFilledPerInterval <- setNames(avgStepsFilledPerInterval, c("Interval", "StepsAvg"))
 
 
 # Weekdays factor 
-daysWeek <- as.Date(unique(dataFilled$date))
-daysWeek <- weekdays(daysWeek)
-
+#daysWeek <- as.Date(unique(dataFilled$date))
+daysWeek <- weekdays(as.Date(dataFilled$date))
 daysFactor <- factor(daysWeek, labels = c("weekday", "weekday", "weekday", "weekday", "weekday", "weekend", "weekend"))
 
-#avgStepsFilledPerIntervalWD <- table(avgStepsFilledPerInterval, daysFactor)
+
+dataFilledCombo <- cbind(dataFilled, as.vector(daysFactor))
+dataFilledCombo <- setNames(dataFilledCombo, c("steps", "date", "interval", "daysweek"))
+
+#dataFilledCombo
+
+dataFilledWD <- dataFilledCombo[dataFilledCombo$daysweek=="weekday", ]
+
+dataFilledWE <- dataFilledCombo[dataFilledCombo$daysweek=="weekend", ]
+
+#dataFilledWE
+
+# Average number of steps per interval (filled data) - weekdays
+avgStepsFilledPerIntervalWD <- aggregate(dataFilledWD$steps, by=list(dataFilledWD$interval), FUN=mean)
+avgStepsFilledPerIntervalWD <- setNames(avgStepsFilledPerIntervalWD, c("Interval", "StepsAvg"))
 
 #avgStepsFilledPerIntervalWD
 
+# Average number of steps per interval (filled data) - weekdays
+avgStepsFilledPerIntervalWE <- aggregate(dataFilledWE$steps, by=list(dataFilledWE$interval), FUN=mean)
+avgStepsFilledPerIntervalWE <- setNames(avgStepsFilledPerIntervalWE, c("Interval", "StepsAvg"))
+
 # Time series plot
 
-plot(avgStepsFilledPerInterval[["Interval"]], y = avgStepsFilledPerInterval[["StepsAvg"]], 
+plot(avgStepsFilledPerIntervalWD[["Interval"]], y = avgStepsFilledPerIntervalWD[["StepsAvg"]], 
 	type="l", main="Daily average number of steps per interval (Weekdays)",
 	xlab="Interval", ylab="Number of steps")
 
+plot(avgStepsFilledPerIntervalWE[["Interval"]], y = avgStepsFilledPerIntervalWE[["StepsAvg"]], 
+	type="l", main="Daily average number of steps per interval (Weekends)",
+	xlab="Interval", ylab="Number of steps")
 
 
 ```
