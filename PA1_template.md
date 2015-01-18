@@ -5,12 +5,57 @@ output:
     keep_md: true
 ---
 
+# Reproducible Research: Assignment 1
 
 ## Loading and preprocessing the data
 
 
+```r
+data <- read.csv("activity.csv")
+stepsData <- data[["steps"]]
+
+# Group number of steps per date
+stepsPerDay <- aggregate(data$steps, by=list(data$date), FUN=sum)
+stepsPerDay <- setNames(stepsPerDay, c("Date", "StepsNum"))
+
+# DEBUG
+#stepsPerDay
+```
 
 ## What is mean total number of steps taken per day?
+
+
+### Daily stats (steps per day):
+
+
+- **Histogram of the total number of steps per day:**
+
+
+
+```r
+stepsDataHist <- as.integer(stepsPerDay[["StepsNum"]])
+nbreaks <- max(stepsPerDay[["StepsNum"]], na.rm=TRUE)
+
+# DEBUG
+#stepsDataHist
+#nbreaks
+
+hist(stepsDataHist, freq=TRUE, 
+	col="#005588", border="#003355", breaks=nbreaks / 1000,
+	main="Number of steps taken per day", xlab="Total number of steps per day", ylab="Frequency")
+```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+
+
+```r
+stepsMean <- mean(stepsPerDay[["StepsNum"]], na.rm=TRUE)
+stepsMedian <- median(stepsPerDay[["StepsNum"]], na.rm=TRUE)
+```
+
+- **Mean number of steps per day:** 10766.19
+
+- **Median number of steps per day:** 10765
 
 
 
