@@ -148,9 +148,42 @@ stepsFilledMedian <- median(stepsPerDayFilled[["StepsNum"]], na.rm=TRUE)
 
 - **Median number of steps per day:** 10395
 
-## Comparison against first computations
+### Comparison against first computations
 
 The imputing of new data adds new values that were not considered before, therefore it impacts the result of computing the histogram, mean and median. In this case, since "NA" was replaced for the overall minimum number of steps, the frequency of zeros largely increased, and the mean and median decreased.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+```r
+# Daily average number of steps per interval (filled data)
+avgStepsFilledPerInterval <- aggregate(dataFilled$steps, by=list(dataFilled$interval), FUN=mean)
+avgStepsFilledPerInterval <- setNames(avgStepsFilledPerInterval, c("Interval", "StepsAvg"))
+
+
+# Weekdays factor 
+daysWeek <- as.Date(unique(dataFilled$date))
+daysWeek <- weekdays(daysWeek)
+
+daysFactor <- factor(daysWeek, labels = c("weekday", "weekday", "weekday", "weekday", "weekday", "weekend", "weekend"))
+```
+
+```
+## Warning in `levels<-`(`*tmp*`, value = if (nl == nL) as.character(labels)
+## else paste0(labels, : duplicated levels in factors are deprecated
+```
+
+```r
+#avgStepsFilledPerIntervalWD <- table(avgStepsFilledPerInterval, daysFactor)
+
+#avgStepsFilledPerIntervalWD
+
+# Time series plot
+
+plot(avgStepsFilledPerInterval[["Interval"]], y = avgStepsFilledPerInterval[["StepsAvg"]], 
+	type="l", main="Daily average number of steps per interval (Weekdays)",
+	xlab="Interval", ylab="Number of steps")
+```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
