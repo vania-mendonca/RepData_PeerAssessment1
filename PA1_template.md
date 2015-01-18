@@ -14,25 +14,22 @@ output:
 data <- read.csv("activity.csv")
 ```
 
+
 ## What is mean total number of steps taken per day?
 
-
 ### Daily stats (steps per day):
-
 
 - **Histogram of the total number of steps per day:**
 
 
-
 ```r
-# Number of steps per date
+# Number of steps per day
 stepsPerDay <- aggregate(data$steps, by=list(data$date), FUN=sum)
 stepsPerDay <- setNames(stepsPerDay, c("Date", "StepsNum"))
 
 # Histogram data
 stepsDataHist <- as.integer(stepsPerDay[["StepsNum"]])
 nbreaks <- max(stepsPerDay[["StepsNum"]], na.rm=TRUE)
-
 
 # Histogram
 hist(stepsDataHist, freq=TRUE, 
@@ -52,7 +49,6 @@ stepsMedian <- median(stepsPerDay[["StepsNum"]], na.rm=TRUE)
 - **Mean number of steps per day:** 10766.19
 
 - **Median number of steps per day:** 10765
-
 
 
 ## What is the average daily activity pattern?
@@ -86,14 +82,14 @@ intervalMaxAvgSteps <- avgStepsPerInterval[["Interval"]][intervalMaxAvgSteps]
 
 ## Imputing missing values
 
+### Handling missing values
+
 
 ```r
 # Number of missing values in Steps column
 stepsNA <- data$steps[data$steps == "NA"]
 naCount <- length(stepsNA)
 ```
-
-### Handling missing values
 
 - **Count of missing values (NA):** `2304`
 
@@ -104,17 +100,12 @@ naCount <- length(stepsNA)
 # Minimum average number of steps out of all intervals
 minStepsPerInterval <- min(avgStepsPerInterval[["StepsAvg"]])
 
-# New dataset
+# New dataset without missing values
 dataFilled <- data
 dataFilled$steps[is.na(dataFilled$steps)] <- minStepsPerInterval
-
-#DEBUG
-#minStepsPerInterval
-#data
-#dataFilled
 ```
 
-### Recomputing steps' histogram, mean and median:
+### Recomputing steps' histogram, mean and median for the new dataset:
 
 - **Histogram of the total number of steps per day:**
 
@@ -157,12 +148,7 @@ The imputing of new data adds new values that were not considered before, theref
 
 
 ```r
-#avgStepsFilledPerInterval <- aggregate(dataFilled$steps, by=list(dataFilled$interval), FUN=mean)
-#avgStepsFilledPerInterval <- setNames(avgStepsFilledPerInterval, c("Interval", "StepsAvg"))
-
-
 # Weekdays factor 
-#daysWeek <- as.Date(unique(dataFilled$date))
 daysWeek <- weekdays(as.Date(dataFilled$date))
 daysFactor <- factor(daysWeek, labels = c("weekday", "weekday", "weekday", "weekday", "weekday", "weekend", "weekend"))
 ```
@@ -173,29 +159,23 @@ daysFactor <- factor(daysWeek, labels = c("weekday", "weekday", "weekday", "week
 ```
 
 ```r
+# Merge labels for days of the week with dataset
 dataFilledCombo <- cbind(dataFilled, as.vector(daysFactor))
 dataFilledCombo <- setNames(dataFilledCombo, c("steps", "date", "interval", "daysweek"))
 
-#dataFilledCombo
-
+# Split weekdays from weekends
 dataFilledWD <- dataFilledCombo[dataFilledCombo$daysweek=="weekday", ]
-
 dataFilledWE <- dataFilledCombo[dataFilledCombo$daysweek=="weekend", ]
-
-#dataFilledWE
 
 # Average number of steps per interval (filled data) - weekdays
 avgStepsFilledPerIntervalWD <- aggregate(dataFilledWD$steps, by=list(dataFilledWD$interval), FUN=mean)
 avgStepsFilledPerIntervalWD <- setNames(avgStepsFilledPerIntervalWD, c("Interval", "StepsAvg"))
 
-#avgStepsFilledPerIntervalWD
-
-# Average number of steps per interval (filled data) - weekdays
+# Average number of steps per interval (filled data) - weekend
 avgStepsFilledPerIntervalWE <- aggregate(dataFilledWE$steps, by=list(dataFilledWE$interval), FUN=mean)
 avgStepsFilledPerIntervalWE <- setNames(avgStepsFilledPerIntervalWE, c("Interval", "StepsAvg"))
 
-# Time series plot
-
+# Time series plot - weekdays
 plot(avgStepsFilledPerIntervalWD[["Interval"]], y = avgStepsFilledPerIntervalWD[["StepsAvg"]], 
 	type="l", main="Daily average number of steps per interval (Weekdays)",
 	xlab="Interval", ylab="Number of steps")
@@ -204,6 +184,7 @@ plot(avgStepsFilledPerIntervalWD[["Interval"]], y = avgStepsFilledPerIntervalWD[
 ![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
 
 ```r
+# Time series plot - weekends
 plot(avgStepsFilledPerIntervalWE[["Interval"]], y = avgStepsFilledPerIntervalWE[["StepsAvg"]], 
 	type="l", main="Daily average number of steps per interval (Weekends)",
 	xlab="Interval", ylab="Number of steps")
